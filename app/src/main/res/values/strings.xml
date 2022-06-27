@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">WeatherApp</string>
+
+    <string name="city_forecast">Les prévisions à %s</string>
+    <string name="unknown_city">Aucune ville ne correspond à votre recherche</string>
+    <string name="empty_input">Veuillez renseigner une ville</string>
+    <string name="unavailable_forecasts">Les prévisions de cette ville ne sont pas disponibles actuellement</string>
+    <string name="temperature_label">%s°</string>
 </resources>
