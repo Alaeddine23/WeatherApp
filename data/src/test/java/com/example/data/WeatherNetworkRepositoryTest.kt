@@ -37,6 +37,7 @@ class WeatherNetworkRepositoryTest {
         //when
         val forecasts = weatherNetworkRepository.loadCityForecasts(cityName, apiKey, unit)
         //then
+
         val city = JsonCity(cityName = "Paris")
         val jsonMain = JsonMain(temp = 14.76F)
         val date = "2021-10-01 18:00:00"
