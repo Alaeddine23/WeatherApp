@@ -1,27 +1,27 @@
 package com.example.data
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.google.gson.annotations.SerializedName
 
 data class JsonCity(
-    @JsonProperty("name")
+    @SerializedName("name")
     val cityName: String
 )
 
 data class JsonMain(
-    @JsonProperty("temp")
+    @SerializedName("temp")
     val temp: Float
 )
 
 data class JsonForecast(
-    @JsonProperty("main")
+    @SerializedName("main")
     val jsonMain: JsonMain,
-    @JsonProperty("dt_txt")
+    @SerializedName("dt_txt")
     val date: String
 )
 
 data class JsonCityWeeklyForecast (
-    @JsonProperty("city")
-    val jsonCity: JsonCity,
-    @JsonProperty("list")
-    val jsonForecasts: List<JsonForecast>
+    @SerializedName("city")
+    val jsonCity: JsonCity?,
+    @SerializedName("list")
+    val jsonForecasts: List<JsonForecast>?
 )
