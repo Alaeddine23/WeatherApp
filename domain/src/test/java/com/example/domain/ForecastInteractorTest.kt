@@ -10,6 +10,7 @@ import org.mockito.BDDMockito.times
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import java.util.*
 
 @RunWith(MockitoJUnitRunner::class)
 class ForecastInteractorTest {
@@ -19,7 +20,8 @@ class ForecastInteractorTest {
 
     @Mock
     lateinit var presenter: WeatherNetworkPresenterInterface
-    @InjectMocks lateinit var interactor: ForecastInteractor
+    @InjectMocks
+    lateinit var interactor: ForecastInteractor
 
     private val name = "Paris"
 
@@ -35,9 +37,9 @@ class ForecastInteractorTest {
     }
 
     @Test
-    fun loadForecastWhenRepositoryReturnSuccessShouldPresentSuccess() {
+    fun loadForecastWhenRepositoryReturnSuccessAndModelContainsTwoForecastsShouldPresentSuccess() {
         //given
-        val model = generateModel()
+        val model = generateModelWithForecasts()
         given(weatherNetworkRepositoryInterface.loadCityForecast(name))
             .willReturn(Success(model = model))
         //when
@@ -46,11 +48,38 @@ class ForecastInteractorTest {
         then(presenter).should(times(1)).presentOnSuccess(model = model)
     }
 
-    private fun generateModel(): WeatherWeeklyForecastModel = WeatherWeeklyForecastModel(
-        cityName = name,
-        forecasts = listOf(ForecastModel(
-            temperature = 25f,
-            date = "Lundi"
-        ))
-    )
+    @Test
+    fun loadForecastWhenRepositoryReturnSuccessAndModelContainsOneForecastShouldPresentFailure() {
+        //given
+        val model = WeatherWeeklyForecastModel(
+            cityName = name,
+            forecasts = listOf(
+                ForecastModel(
+                    temperature = 25f,
+                    date = Date()
+                )
+            )
+        )
+        given(weatherNetworkRepositoryInterface.loadCityForecast(name))
+            .willReturn(Success(model = model))
+        //when
+        interactor.loadForecast(cityName = name)
+        //then
+        then(presenter).should(times(1)).presentOnFailure()
+    }
+
+    private fun generateModelWithForecasts(): WeatherWeeklyForecastModel =
+        WeatherWeeklyForecastModel(
+            cityName = name,
+            forecasts = listOf(
+                ForecastModel(
+                    temperature = 25f,
+                    date = Date()
+                ),
+                ForecastModel(
+                    temperature = 25f,
+                    date = Date()
+                )
+            )
+        )
 }
