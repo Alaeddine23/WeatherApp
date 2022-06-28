@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class NetworkModule {
 
-    companion object{
+    companion object {
         private const val BASE_URL = "https://pro.openweathermap.org/data/2.5/"
     }
 
@@ -13,4 +13,5 @@ class NetworkModule {
         .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
+
 }
