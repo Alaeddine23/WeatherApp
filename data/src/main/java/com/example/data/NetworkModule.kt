@@ -9,8 +9,8 @@ open class NetworkModule {
         private const val BASE_URL = "https://pro.openweathermap.org/data/2.5/"
     }
 
-    fun provideRetrofit(): Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+    fun provideRetrofit(url : String = BASE_URL): Retrofit = Retrofit.Builder()
+        .baseUrl(url)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
