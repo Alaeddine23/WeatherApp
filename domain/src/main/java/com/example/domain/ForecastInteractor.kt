@@ -9,7 +9,7 @@ class ForecastInteractor(
     private val weatherNetworkPresenterInterface: WeatherNetworkPresenterInterface
 ) {
 
-    companion object{
+    companion object {
         private const val MIN_FORECASTS = 2
         private const val MIN_HOUR = 8
         private const val MAX_HOUR = 20
@@ -27,6 +27,9 @@ class ForecastInteractor(
             Failure -> weatherNetworkPresenterInterface.presentOnFailure()
         }
     }
+
+    suspend fun loadForecastForViewModel(cityName: String): WeatherNetworkRepositoryInterface.WeatherWeeklyForecastResponse =
+        repository.loadCityForecast(cityName = cityName)
 
     private fun getRelevantForecasts(forecasts: List<ForecastModel>): List<ForecastModel> =
         forecasts.filter { forecastModel ->
