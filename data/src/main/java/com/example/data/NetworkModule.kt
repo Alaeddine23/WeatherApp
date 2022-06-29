@@ -13,4 +13,5 @@ open class NetworkModule {
         .baseUrl(url)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
+    
 }

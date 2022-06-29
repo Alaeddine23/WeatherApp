@@ -1,26 +1,31 @@
 package com.example.data
 
+import com.example.domain.ForecastModel
+import com.example.domain.WeatherNetworkRepositoryInterface.WeatherWeeklyForecastResponse.Failure
+import com.example.domain.WeatherNetworkRepositoryInterface.WeatherWeeklyForecastResponse.Success
+import com.example.domain.WeatherWeeklyForecastModel
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.Mockito.mock
-import org.mockito.junit.MockitoJUnitRunner
-import retrofit2.Response
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.junit.jupiter.MockitoExtension
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.Month
+import java.time.ZoneId
+import java.util.*
 
+@ExtendWith(MockitoExtension::class)
 class WeatherNetworkRepositoryTest {
     private lateinit var weatherNetworkRepository: WeatherNetworkRepository
     private lateinit var networkModule: NetworkModule
     private lateinit var mockServer: MockWebServer
     private val cityName = "Paris"
-    private val unit = "metric"
-    private val apiKey = "fakeApiKey"
 
-    @Before
+    @BeforeEach
     fun setUp() {
         mockServer = MockWebServer()
         networkModule = NetworkModule()
@@ -29,42 +34,57 @@ class WeatherNetworkRepositoryTest {
     }
 
     @Test
-    fun testHappyPath() = runBlocking {
+    fun testHappyPath() {
         //given
         val response = MockResponse().setResponseCode(200)
             .setBody(FileUtils.readJson("forecast.json"))
         mockServer.enqueue(response)
         //when
-        val forecasts = weatherNetworkRepository.loadCityForecasts(cityName, apiKey, unit)
+        val forecasts = runBlocking { weatherNetworkRepository.loadCityForecast(cityName) }
         //then
-        val city = JsonCity(cityName = "Paris")
-        val jsonMain = JsonMain(temp = 14.76F)
-        val date = "2021-10-01 18:00:00"
-        val expectedBody = JsonCityWeeklyForecast(jsonCity = city, listOf(element = JsonForecast(jsonMain, date)))
-        assertEquals(expectedBody, forecasts?.body())
+        val date = Date.from(
+            LocalDateTime.of(2021, Month.OCTOBER, 1, 18, 0, 0).toInstant(
+                ZoneId.systemDefault().rules.getOffset(
+                    Instant.now()
+                )
+            )
+        )
+        val expected = Success(
+            model = WeatherWeeklyForecastModel(
+                cityName = "Paris",
+                listOf(element = ForecastModel(temperature = 14.76F, date = date))
+            )
+        )
+        assertThat(forecasts).isEqualTo(expected)
     }
 
     @Test
-    fun testSaddyPath() = runBlocking {
+    fun testSaddyPath() {
         // given
         val response = MockResponse().setResponseCode(404)
         mockServer.enqueue(response)
         //when
-        val forecasts: Response<JsonCityWeeklyForecast>? = weatherNetworkRepository.loadCityForecasts(cityName, apiKey, unit)
+        val forecasts = runBlocking { weatherNetworkRepository.loadCityForecast(cityName) }
         //then
-        assertEquals(null, forecasts)
+        assertThat(forecasts).isEqualTo(Failure)
     }
 
     @Test
-    fun testEmptyJson() = runBlocking {
+    fun testEmptyJson() {
         //given
         val response = MockResponse().setResponseCode(200)
             .setBody(FileUtils.readJson("forecast_empty.json"))
         mockServer.enqueue(response)
         //when
-        val forecasts = weatherNetworkRepository.loadCityForecasts(cityName, apiKey, unit)
+        val forecasts = runBlocking { weatherNetworkRepository.loadCityForecast(cityName) }
         //then
-        val expectedBody = JsonCityWeeklyForecast(null, null)
-        assertEquals(expectedBody, forecasts?.body())
+        assertThat(forecasts).isEqualTo(
+            Success(
+                WeatherWeeklyForecastModel(
+                    cityName = "",
+                    forecasts = emptyList()
+                )
+            )
+        )
     }
 }
