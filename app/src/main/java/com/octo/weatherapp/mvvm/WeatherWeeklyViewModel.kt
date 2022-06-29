@@ -13,23 +13,24 @@ import kotlinx.coroutines.launch
 
 class WeatherWeeklyViewModel : ViewModel() {
 
+    sealed class UiState {
+        data class Success(val weatherWeeklyForecastDisplayModel: WeatherWeeklyForecastDisplayModel) : UiState()
+        object Failed : UiState()
+    }
+
     private val interactor: ForecastInteractor = ForecastModule.provideInteractor()
 
-    private val successLiveDataMutable = MutableLiveData<WeatherWeeklyForecastDisplayModel>()
-    val successLiveData: LiveData<WeatherWeeklyForecastDisplayModel> = successLiveDataMutable
-
-    private val failedLiveDataMutable = MutableLiveData<Boolean>()
-    val failedLiveData: LiveData<Boolean> = failedLiveDataMutable
+    private val liveDataMutable = MutableLiveData<UiState>()
+    val liveData: LiveData<UiState> = liveDataMutable
 
     fun loadForecast(cityName: String) {
         viewModelScope.launch {
             when (val result = interactor.loadForecast(cityName)) {
                 WeatherNetworkRepositoryInterface.WeatherWeeklyForecastResponse.Failure ->
-                    failedLiveDataMutable.postValue(true)
+                    liveDataMutable.postValue(UiState.Failed)
                 is WeatherNetworkRepositoryInterface.WeatherWeeklyForecastResponse.Success -> {
                     val displayModel = result.model.toDisplayModel()
-                    failedLiveDataMutable.postValue(false)
-                    successLiveDataMutable.postValue(displayModel)
+                    liveDataMutable.postValue(UiState.Success(displayModel))
                 }
             }
         }

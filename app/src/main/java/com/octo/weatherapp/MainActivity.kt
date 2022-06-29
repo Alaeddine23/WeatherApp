@@ -4,11 +4,8 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
-import com.example.data.NetworkModule
 import com.example.presentation.WeatherWeeklyForecastDisplayModel
-import com.example.presentation.WeatherWeeklyForecastView
 import com.octo.weatherapp.databinding.ActivityMainBinding
 import com.octo.weatherapp.mvvm.WeatherWeeklyViewModel
 import kotlinx.coroutines.Dispatchers
@@ -39,13 +36,10 @@ class MainActivity : AppCompatActivity() {
 
         })
 
-        viewModel.successLiveData.observe(this){
-            displayForecasts(it)
-        }
-
-        viewModel.failedLiveData.observe(this){ isFailed ->
-            if(isFailed){
-                displayError()
+        viewModel.liveData.observe(this){ uiState ->
+            when(uiState){
+                WeatherWeeklyViewModel.UiState.Failed -> displayError()
+                is WeatherWeeklyViewModel.UiState.Success -> displayForecasts(uiState.weatherWeeklyForecastDisplayModel)
             }
         }
 
