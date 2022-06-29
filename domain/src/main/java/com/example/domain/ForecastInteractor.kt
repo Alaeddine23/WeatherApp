@@ -8,7 +8,7 @@ class ForecastInteractor(
     private val repository: WeatherNetworkRepositoryInterface,
     private val weatherNetworkPresenterInterface: WeatherNetworkPresenterInterface
 ) {
-    fun loadForecast(cityName: String) {
+    suspend fun loadForecast(cityName: String) {
         when (val result = repository.loadCityForecast(cityName = cityName)) {
             is Success -> {
                 if (getRelevantForecasts(result.model.forecasts).size < 2) {
