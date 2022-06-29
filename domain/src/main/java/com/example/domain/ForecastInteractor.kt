@@ -5,28 +5,17 @@ import com.example.domain.WeatherNetworkRepositoryInterface.WeatherWeeklyForecas
 import java.util.*
 
 class ForecastInteractor(
-    private val repository: WeatherNetworkRepositoryInterface,
-    private val weatherNetworkPresenterInterface: WeatherNetworkPresenterInterface
+    private val repository: WeatherNetworkRepositoryInterface
 ) {
 
-    companion object{
+    companion object {
         private const val MIN_FORECASTS = 2
         private const val MIN_HOUR = 8
         private const val MAX_HOUR = 20
     }
 
-    suspend fun loadForecast(cityName: String) {
-        when (val result = repository.loadCityForecast(cityName = cityName)) {
-            is Success -> {
-                if (getRelevantForecasts(result.model.forecasts).size < MIN_FORECASTS) {
-                    weatherNetworkPresenterInterface.presentOnFailure()
-                } else {
-                    weatherNetworkPresenterInterface.presentOnSuccess(result.model)
-                }
-            }
-            Failure -> weatherNetworkPresenterInterface.presentOnFailure()
-        }
-    }
+    suspend fun loadForecast(cityName: String): WeatherNetworkRepositoryInterface.WeatherWeeklyForecastResponse =
+        repository.loadCityForecast(cityName)
 
     private fun getRelevantForecasts(forecasts: List<ForecastModel>): List<ForecastModel> =
         forecasts.filter { forecastModel ->
