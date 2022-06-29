@@ -15,7 +15,7 @@ class ForecastInteractor(
         private const val MAX_HOUR = 20
     }
 
-    fun loadForecast(cityName: String) {
+    suspend fun loadForecast(cityName: String) {
         when (val result = repository.loadCityForecast(cityName = cityName)) {
             is Success -> {
                 if (getRelevantForecasts(result.model.forecasts).size < MIN_FORECASTS) {

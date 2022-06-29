@@ -13,4 +13,6 @@ class NetworkModule {
         .baseUrl(url)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
+
+    fun provideWeatherNetworkRepository(): WeatherNetworkRepository = WeatherNetworkRepository(provideRetrofit())
 }

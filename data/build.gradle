@@ -54,4 +54,7 @@ dependencies {
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.4.0'
     testImplementation 'commons-io:commons-io:2.6'
+
+    implementation project(path: ':domain')
+
 }

@@ -7,6 +7,6 @@ interface WeatherNetworkRepositoryInterface {
         object Failure : WeatherWeeklyForecastResponse()
     }
 
-    fun loadCityForecast(cityName: String): WeatherWeeklyForecastResponse
+    suspend fun loadCityForecast(cityName: String): WeatherWeeklyForecastResponse
 }
 
